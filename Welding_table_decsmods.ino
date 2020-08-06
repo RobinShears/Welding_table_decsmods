@@ -6,6 +6,7 @@
 int SpeedIn; //pot read value
 int speedPot = A6; //pot read value
 int PWM = 5; // outputs variable sqaure wave for speed
+int PWMstate;
 int DIRSwitch = 3; //switch to switch direction
 int DIRon = 2; //always on
 int DIR1 = 11;  //Direction control 1
@@ -28,6 +29,7 @@ void setup() {
   digitalWrite(DIRon, HIGH);
   digitalWrite(DIR1, HIGH);
   digitalWrite(pulseV, HIGH);
+  digitalWrite(PWM, HIGH);
 }
 
 
@@ -41,9 +43,9 @@ void loop() {
   directionSwitch();
 
   SpeedIn = analogRead(speedPot);
-  Serial.print("Speed in: ");
-  Serial.print(SpeedIn);
-  Serial.print("   ");
+  // Serial.print("Speed in: ");
+  // Serial.print(SpeedIn);
+  // Serial.print("   ");
 
   if (SpeedIn > lastSpeed + 1 || SpeedIn < lastSpeed - 1) {
     Sqauresp = map(SpeedIn, 0, 1024, 312, 38500);
@@ -51,38 +53,38 @@ void loop() {
   }
 
 
-  Serial.print("Squaresp: ");
+  // Serial.print("Squaresp: ");
 
-  Serial.print(Sqauresp);
-  Serial.println(" ");
+  //Serial.print(Sqauresp);
+  //  Serial.println(" ");
   //Serial.println(" ");
 
 
 
   uint32_t currentTime = micros();
 
-  if (currentTime - previousTime >= Sqauresp*100) {
-
-    if (PWM == HIGH) {
-      digitalWrite(PWM, LOW);
+  if (currentTime - previousTime >= Sqauresp * 100) {
+    Serial.println(Sqauresp * 100);
+    if (PWMstate == HIGH) {
+      PWMstate = LOW;
     } else {
-      digitalWrite(PWM, HIGH);
+      PWMstate = HIGH;
     }
 
-
+    digitalWrite(PWM, PWMstate);
     previousTime = currentTime;
   }
-
 
 
 //use 7 segment library here will update every ten pulses to releave the control circuit
 //print(calib*Speedin);
 
-
-
-
-
+  
 }
+
+
+
+
 
 
 
@@ -92,7 +94,7 @@ void directionSwitch() {
 
   if (digitalRead(DIRSwitch) == HIGH) {   //controls the direction of the table based on the switch position
     digitalWrite(DIR2, LOW);
-    
+
   }
   else {
     digitalWrite(DIR2, HIGH);
